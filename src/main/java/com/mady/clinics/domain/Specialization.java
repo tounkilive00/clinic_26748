@@ -2,8 +2,10 @@ package com.mady.clinics.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,43 +13,43 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity 
-
-@Table (name = "specializations")
+@Entity
+@Table(name = "specializations")
 public class Specialization {
-    @Id 
-    @GeneratedValue(strategy = GenerationType.UUID )
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID specializationId;
-    @Column (name = "specialization_name")
+
+    @Column(name = "specialization_name")
     private String specializationName;
 
-    // generate getters and setters for the fields
-    public UUID getSpecializationId() {
-        return specializationId;
-    }
-    public void setSpecializationId(UUID specializationId) {
-        this.specializationId = specializationId;
-    }
-    public String getSpecializationName() {
-        return specializationName;
-    }
-    public void setSpecializationName(String specializationName) {
-        this.specializationName = specializationName;
-    }
-
-    // generate getters and setters for the doctors list
-    public List<Doctor> getDoctors() {
-        return doctors;
-    }
-    public void setDoctors(List<Doctor> doctors) {
-        this.doctors = doctors;
-    }
-
-    // relationships with other entities can be added here, such as doctors, patients, etc.
     @JsonIgnore
     @ManyToMany(mappedBy = "specializations")
     private List<Doctor> doctors = new ArrayList<>();
-}
 
+    // Getters and Setters
+    public UUID getSpecializationId() { return specializationId; }
+    public void setSpecializationId(UUID specializationId) { this.specializationId = specializationId; }
+
+    public String getSpecializationName() { return specializationName; }
+    public void setSpecializationName(String specializationName) { this.specializationName = specializationName; }
+
+    public List<Doctor> getDoctors() { return doctors; }
+    public void setDoctors(List<Doctor> doctors) { this.doctors = doctors; }
+
+    // equals and hashCode based on specializationId so List.contains() and remove() work correctly
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Specialization that = (Specialization) o;
+        return specializationId != null && specializationId.equals(that.specializationId);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+}
