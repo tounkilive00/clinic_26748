@@ -45,4 +45,10 @@ public class SpecializationController {
         specializationService.deleteSpecialization(id);
         return new ResponseEntity<>("Specialization deleted successfully", HttpStatus.OK);
     }
+
+    // B3: unused specializations
+    @GetMapping("/unused")
+    public ResponseEntity<List<Specialization>> getUnusedSpecializations() {
+        return new ResponseEntity<>(specializationService.getUnusedSpecializations(), HttpStatus.OK);
+    }
 }

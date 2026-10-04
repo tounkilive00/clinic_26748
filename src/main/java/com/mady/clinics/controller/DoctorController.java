@@ -17,14 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import com.mady.clinics.domain.Doctor;
 import com.mady.clinics.service.DoctorService;
 
-@RestController 
-@RequestMapping ("/api/doctors")
+@RestController
+@RequestMapping("/api/doctors")
 public class DoctorController {
-    
+
     @Autowired
     private DoctorService DoctorService;
 
@@ -56,14 +55,28 @@ public class DoctorController {
         return new ResponseEntity<>("Doctor deleted successfully", HttpStatus.OK);
     }
 
-    @PutMapping("/{doctorId}/office/{officeId}")
+    // Assign office (supports both /office/ and /offices/)
+    @PutMapping({"/{doctorId}/office/{officeId}", "/{doctorId}/offices/{officeId}"})
     public ResponseEntity<Doctor> assignOffice(@PathVariable UUID doctorId, @PathVariable UUID officeId) {
         Doctor updated = DoctorService.assignOffice(doctorId, officeId);
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
-    // Search doctors by name or date of birth
-    // GET /api/doctors/search?name=Gregory or GET /api/doctors/search?dob=1975-05-15
+    // Assign specialization (supports both /specialization/ and /specializations/)
+    @PutMapping({"/{doctorId}/specialization/{specializationId}", "/{doctorId}/specializations/{specializationId}"})
+    public ResponseEntity<Doctor> addSpecialization(@PathVariable UUID doctorId, @PathVariable UUID specializationId) {
+        Doctor updated = DoctorService.addSpecializationToDoctor(doctorId, specializationId);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    // Remove specialization
+    @DeleteMapping({"/{doctorId}/specialization/{specializationId}", "/{doctorId}/specializations/{specializationId}"})
+    public ResponseEntity<Doctor> removeSpecialization(@PathVariable UUID doctorId, @PathVariable UUID specializationId) {
+        Doctor updated = DoctorService.removeSpecializationFromDoctor(doctorId, specializationId);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
+    }
+
+    // Existing search
     @GetMapping("/search")
     public ResponseEntity<List<Doctor>> searchDoctors(
             @RequestParam(required = false) String name,
@@ -76,20 +89,15 @@ public class DoctorController {
         return new ResponseEntity<>(DoctorService.getAllDoctors(), HttpStatus.OK);
     }
 
-    // Assign a specialization to a doctor
-    @PutMapping("/{doctorId}/specialization/{specializationId}")
-    public ResponseEntity<Doctor> addSpecialization(@PathVariable UUID doctorId, @PathVariable UUID specializationId) {
-        Doctor updated = DoctorService.addSpecializationToDoctor(doctorId, specializationId);
-        return new ResponseEntity<>(updated, HttpStatus.OK);
+    // B1: doctors by specialization
+    @GetMapping("/by-specialization")
+    public ResponseEntity<List<Doctor>> getBySpecialization(@RequestParam String name) {
+        return new ResponseEntity<>(DoctorService.getDoctorsBySpecialization(name), HttpStatus.OK);
     }
 
-    // Remove a specialization from a doctor
-    @DeleteMapping("/{doctorId}/specialization/{specializationId}")
-    public ResponseEntity<Doctor> removeSpecialization(@PathVariable UUID doctorId, @PathVariable UUID specializationId) {
-        Doctor updated = DoctorService.removeSpecializationFromDoctor(doctorId, specializationId);
-        return new ResponseEntity<>(updated, HttpStatus.OK);
+    // B2: doctors without office
+    @GetMapping("/without-office")
+    public ResponseEntity<List<Doctor>> getDoctorsWithoutOffice() {
+        return new ResponseEntity<>(DoctorService.getDoctorsWithoutOffice(), HttpStatus.OK);
     }
 }
-
-
-

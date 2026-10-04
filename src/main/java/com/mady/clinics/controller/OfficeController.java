@@ -71,6 +71,18 @@ public class OfficeController {
         return updateOffice(officeNumber, office);
     }
 
+    // Quiz B3 endpoint: GET /api/offices/vacant
+    @GetMapping("/vacant")
+    public ResponseEntity<List<Office>> getVacantOffices() {
+        return new ResponseEntity<>(officeService.getVacantOffices(), HttpStatus.OK);
+    }
 
-
+    @GetMapping("/busiest")
+    public ResponseEntity<?> getBusiestOffice() {
+        java.util.Optional<Object[]> busiest = officeService.getBusiestOffice();
+        if (busiest.isEmpty()) {
+            return new ResponseEntity<>("No appointments yet", HttpStatus.OK);
+        }
+        return new ResponseEntity<>(busiest.get(), HttpStatus.OK);
+    }
 }
