@@ -57,4 +57,17 @@ public class OfficeService {
             throw new RuntimeException("Office not found with id: " + officeId);
         }
     }
+
+    // Quiz requirement B3: get vacant offices
+    public List<Office> getVacantOffices() {
+        return officeRepository.findVacantOffices();
+    }
+
+    public Optional<Object[]> getBusiestOffice() {
+        List<Object[]> results = officeRepository.findBusiestOffice(org.springframework.data.domain.PageRequest.of(0, 1));
+        if (results.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(results.get(0));
+    }
 }

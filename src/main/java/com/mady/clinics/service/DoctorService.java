@@ -4,41 +4,40 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mady.clinics.domain.Doctor;
 import com.mady.clinics.domain.Office;
+import com.mady.clinics.domain.Specialization;
 import com.mady.clinics.repository.DoctorRepository;
 import com.mady.clinics.repository.OfficeRepository;
+import com.mady.clinics.repository.SpecializationsRepository;
 
 @Service
 public class DoctorService {
-    
-    @Autowired 
+
+    @Autowired
     private DoctorRepository doctorRepository;
 
     @Autowired
     private OfficeRepository officeRepository;
 
     @Autowired
-    private com.mady.clinics.repository.SpecializationsRepository specializationsRepository;
+    private SpecializationsRepository specializationsRepository;
 
-
-    // Add a method to save a doctor
-    public Doctor saveDoctor(Doctor doctor){
+    public Doctor saveDoctor(Doctor doctor) {
         return doctorRepository.save(doctor);
     }
-    
-    public List<Doctor> getAllDoctors() { // Add a method to get all doctors
+
+    public List<Doctor> getAllDoctors() {
         return doctorRepository.findAll();
     }
 
-    public Doctor getDoctorById(UUID doctorId) { // Add a method to get a doctor by ID
+    public Doctor getDoctorById(UUID doctorId) {
         Optional<Doctor> doctor = doctorRepository.findById(doctorId);
         if (doctor.isPresent()) {
             return doctor.get();
@@ -47,7 +46,7 @@ public class DoctorService {
         }
     }
 
-    public void deleteDoctor(UUID doctorId) { // Add a method to delete a doctor by ID
+    public void deleteDoctor(UUID doctorId) {
         doctorRepository.deleteById(doctorId);
     }
 
@@ -59,10 +58,10 @@ public class DoctorService {
             doctor.setLastName(updatedDoctor.getLastName());
             doctor.setDateOfBirth(updatedDoctor.getDateOfBirth());
 
-            // Update specializations if provided in request body
+            // Update specializations if provided
             if (updatedDoctor.getSpecializations() != null) {
-                List<com.mady.clinics.domain.Specialization> resolvedSpecs = new ArrayList<>();
-                for (com.mady.clinics.domain.Specialization spec : updatedDoctor.getSpecializations()) {
+                List<Specialization> resolvedSpecs = new ArrayList<>();
+                for (Specialization spec : updatedDoctor.getSpecializations()) {
                     if (spec.getSpecializationId() != null) {
                         specializationsRepository.findById(spec.getSpecializationId())
                                 .ifPresent(resolvedSpecs::add);
@@ -83,8 +82,7 @@ public class DoctorService {
         }
     }
 
-
-    // Assign an existing office to a doctor
+    // Assign office to doctor
     public Doctor assignOffice(UUID doctorId, UUID officeId) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + doctorId));
@@ -94,22 +92,21 @@ public class DoctorService {
         return doctorRepository.save(doctor);
     }
 
-    // Search doctors by first or last name
+    // Existing search methods
     public List<Doctor> searchByName(String name) {
-
         return doctorRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(name, name);
     }
 
-    // Search doctors by date of birth
     public List<Doctor> searchByDateOfBirth(Date dateOfBirth) {
         return doctorRepository.findByDateOfBirth(dateOfBirth);
     }
 
-    // Add a specialization to a doctor
+    // Add specialization (fixed with @Transactional so Hibernate flushes)
+    @Transactional
     public Doctor addSpecializationToDoctor(UUID doctorId, UUID specializationId) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + doctorId));
-        com.mady.clinics.domain.Specialization spec = specializationsRepository.findById(specializationId)
+        Specialization spec = specializationsRepository.findById(specializationId)
                 .orElseThrow(() -> new RuntimeException("Specialization not found with id: " + specializationId));
         if (!doctor.getSpecializations().contains(spec)) {
             doctor.getSpecializations().add(spec);
@@ -117,16 +114,24 @@ public class DoctorService {
         return doctorRepository.save(doctor);
     }
 
-    // Remove a specialization from a doctor
+    // Remove specialization (fixed with @Transactional)
+    @Transactional
     public Doctor removeSpecializationFromDoctor(UUID doctorId, UUID specializationId) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + doctorId));
-        com.mady.clinics.domain.Specialization spec = specializationsRepository.findById(specializationId)
+        Specialization spec = specializationsRepository.findById(specializationId)
                 .orElseThrow(() -> new RuntimeException("Specialization not found with id: " + specializationId));
         doctor.getSpecializations().remove(spec);
         return doctorRepository.save(doctor);
     }
+
+    // B1: doctors by specialization name
+    public List<Doctor> getDoctorsBySpecialization(String name) {
+        return doctorRepository.findBySpecializationName(name);
+    }
+
+    // B2: doctors without an office
+    public List<Doctor> getDoctorsWithoutOffice() {
+        return doctorRepository.findDoctorsWithoutOffice();
+    }
 }
-
-
-
