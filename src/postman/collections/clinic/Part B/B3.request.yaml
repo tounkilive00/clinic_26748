@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/offices/vacant
+method: GET
+order: 2569564581275382

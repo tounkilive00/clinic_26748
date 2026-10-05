@@ -1,0 +1,9 @@
+$kind: http-request
+name: "Pagination & Sorting:"
+url: http://localhost:8080/api/appointments/page?page=0&size=5&sort=appointmentDate,desc
+method: GET
+queryParams:
+  page: "0"
+  size: "5"
+  sort: appointmentDate,desc
+order: 5000

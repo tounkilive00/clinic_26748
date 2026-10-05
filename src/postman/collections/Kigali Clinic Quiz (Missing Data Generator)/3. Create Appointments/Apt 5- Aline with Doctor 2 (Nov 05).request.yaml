@@ -1,0 +1,16 @@
+$kind: http-request
+name: "Apt 5: Aline with Doctor 2 (Nov 05)"
+url: http://localhost:8080/api/appointments/save
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "appointmentDate": "2026-11-05",
+      "status": "SCHEDULED",
+      "doctor": { "doctorId": "{{ALICE_KAYITESI_ID}}" },
+      "patient": { "patientId": "33aa81b4-4c46-4abc-8251-7a9ba980476b" }
+    }
+order: 5000

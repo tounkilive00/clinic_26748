@@ -82,14 +82,24 @@ public class DoctorService {
         }
     }
 
-    // Assign office to doctor
+    // Assign office to doctor (safely handles re-assigning if office is taken)
+    @Transactional
     public Doctor assignOffice(UUID doctorId, UUID officeId) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + doctorId));
         Office office = officeRepository.findById(officeId)
                 .orElseThrow(() -> new RuntimeException("Office not found with id: " + officeId));
+        
+        // If this office is currently held by another doctor, clear it from that doctor first and flush
+        doctorRepository.findByOfficeOfficeId(officeId).ifPresent(previousDoctor -> {
+            if (!previousDoctor.getDoctorId().equals(doctorId)) {
+                previousDoctor.setOffice(null);
+                doctorRepository.saveAndFlush(previousDoctor);
+            }
+        });
+
         doctor.setOffice(office);
-        return doctorRepository.save(doctor);
+        return doctorRepository.saveAndFlush(doctor);
     }
 
     // Existing search methods

@@ -1,0 +1,14 @@
+$kind: http-request
+url: http://localhost:8080/api/doctors/save
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "firstName": "Alice",
+      "lastName": "Kayitesi",
+      "dateOfBirth": "1985-06-20"
+    }
+order: 2000

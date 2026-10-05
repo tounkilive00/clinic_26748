@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:8080/api/doctors/by-specialization?name=Cardiology
+method: GET
+queryParams:
+  name: Cardiology
+order: 1791175641746

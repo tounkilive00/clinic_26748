@@ -1,0 +1,7 @@
+$kind: http-request
+url: http://localhost:8080/api/appointments/between?start=2026-10-01&end=2026-10-31
+method: GET
+queryParams:
+  start: 2026-10-01
+  end: 2026-10-31
+order: 3857830480644766

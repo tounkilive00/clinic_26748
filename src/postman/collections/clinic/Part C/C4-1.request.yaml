@@ -1,0 +1,8 @@
+$kind: http-request
+name: C4
+url: http://localhost:8080/api/appointments/cancel-day?doctorId=3087ae16-4808-4051-b3f2-2ee571113758&date=2026-10-05
+method: PATCH
+queryParams:
+  doctorId: 3087ae16-4808-4051-b3f2-2ee571113758
+  date: 2026-10-05
+order: 4503050089946525

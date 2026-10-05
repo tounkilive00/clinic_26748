@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:8080/api/appointments/by-status?status=COMPLETED
+method: GET
+queryParams:
+  status: COMPLETED
+order: 3494635316416458

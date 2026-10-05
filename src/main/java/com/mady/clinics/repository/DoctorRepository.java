@@ -23,4 +23,6 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     // B2 - JPQL: doctors without an office
     @Query("SELECT d FROM Doctor d WHERE d.office IS NULL ORDER BY d.lastName ASC")
     List<Doctor> findDoctorsWithoutOffice();
+
+    java.util.Optional<Doctor> findByOfficeOfficeId(UUID officeId);
 }

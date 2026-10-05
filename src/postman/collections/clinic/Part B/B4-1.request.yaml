@@ -1,0 +1,5 @@
+$kind: http-request
+name: B4
+url: http://localhost:8080/api/patients/no-appointments
+method: GET
+order: 4471700165041033

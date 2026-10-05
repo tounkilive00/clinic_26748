@@ -1,0 +1,15 @@
+# Use this workspace to collaborate
+workspace:
+  id: 021cb930-04f9-4aa1-82de-d58f89bce237
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/Kigali Clinic Quiz (Missing Data Generator): 4cd4236e-7741-49e4-9c80-51d2fd41117e
+
+# All resources in the `postman/` folder are automatically registered in Local View.
+# Point to additional files outside the `postman/` folder to register them individually. Example:
+#localResources:
+#  collections:
+#    - ../tests/E2E Test Collection/

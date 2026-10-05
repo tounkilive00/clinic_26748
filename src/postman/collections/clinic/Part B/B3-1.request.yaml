@@ -1,0 +1,5 @@
+$kind: http-request
+name: B3
+url: http://localhost:8080/api/specializations/unused
+method: GET
+order: 3309316552064685

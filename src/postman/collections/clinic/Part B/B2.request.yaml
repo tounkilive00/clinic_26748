@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/doctors/without-office
+method: GET
+order: 710194553779730

@@ -1,0 +1,16 @@
+$kind: http-request
+name: "Apt 10: Claude with Doctor 3 (Nov 22)"
+url: http://localhost:8080/api/appointments/save
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "appointmentDate": "2026-11-22",
+      "status": "CONFIRMED",
+      "doctor": { "doctorId": "{{ERIC_HABIMANA_ID}}" },
+      "patient": { "patientId": "fefd6d33-293e-4731-b0ae-f7cf6ca2521d" }
+    }
+order: 10000

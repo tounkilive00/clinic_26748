@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/patients/of-doctor/e47c5319-8f8e-48ee-9955-c30059187435
+method: GET
+order: 4057335369812433

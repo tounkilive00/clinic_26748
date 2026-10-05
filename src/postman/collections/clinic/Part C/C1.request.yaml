@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/appointments/stats/by-status
+method: GET
+order: 1791175720867
