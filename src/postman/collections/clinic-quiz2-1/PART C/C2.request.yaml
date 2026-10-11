@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/prescriptions/appointment/dec15797-d552-4e01-9f64-8fe548e7335e
+method: GET
+order: 3438333782062501

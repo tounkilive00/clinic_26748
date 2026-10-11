@@ -50,4 +50,23 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     @Modifying
     @Query("DELETE FROM Appointment a WHERE a.status = com.mady.clinics.domain.AppointmentStatus.CANCELLED AND a.appointmentDate < :date")
     int deleteCancelledBefore(@Param("date") LocalDate date);
+
+    // D1 - DERIVED: Doctor's agenda for a day without CANCELLED
+    List<Appointment> findByDoctor_DoctorIdAndAppointmentDateAndStatusNot(UUID doctorId, LocalDate appointmentDate, AppointmentStatus status);
+
+    // D2 - DERIVED: Upcoming appointments of a patient
+    List<Appointment> findByPatient_SsNumberAndAppointmentDateGreaterThanEqualAndStatusInOrderByAppointmentDateAsc(
+            String ssNumber, LocalDate date, List<AppointmentStatus> statuses);
+
+    // D4 - DERIVED counts for dashboard
+    long countByAppointmentDate(LocalDate appointmentDate);
+    long countByStatus(AppointmentStatus status);
+
+    // Bonus +5 - JPQL: Doctor workload
+    @Query("SELECT a.doctor.firstName, a.doctor.lastName, COUNT(a) FROM Appointment a " +
+           "WHERE a.status = com.mady.clinics.domain.AppointmentStatus.COMPLETED " +
+           "AND a.appointmentDate BETWEEN :start AND :end " +
+           "GROUP BY a.doctor.doctorId, a.doctor.firstName, a.doctor.lastName " +
+           "ORDER BY COUNT(a) DESC")
+    List<Object[]> findDoctorWorkload(@Param("start") LocalDate start, @Param("end") LocalDate end);
 }

@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/doctors/3087ae16-4808-4051-b3f2-2ee571113758/specializations/70bd8447-66e2-43b0-8730-b42f2dd2281d
+method: DELETE
+order: 1753527373887721

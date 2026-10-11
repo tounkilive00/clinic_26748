@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/doctors/fd2923ee-9902-4d32-89cd-eb5ce30c9fb6/specializations/34854517-48ae-449c-a84c-3f3fdce5c061
+method: PUT
+order: 1791742930429

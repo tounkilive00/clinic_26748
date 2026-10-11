@@ -1,0 +1,6 @@
+$kind: http-request
+url: " http://localhost:8080/api/appointments/7f853300-3586-4fce-b156-5c46e0ced6aa/reschedule?newDate=2026-11-30"
+method: PATCH
+queryParams:
+  newDate: 2026-11-30
+order: 2397226323001145

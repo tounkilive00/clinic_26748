@@ -25,4 +25,9 @@ public interface DoctorRepository extends JpaRepository<Doctor, UUID> {
     List<Doctor> findDoctorsWithoutOffice();
 
     java.util.Optional<Doctor> findByOfficeOfficeId(UUID officeId);
+    boolean existsByOffice_OfficeNumber(int officeNumber);
+
+    // D3 - JPQL: search doctors by first name or last name contains, ignoring case, sorted by last name
+    @Query("SELECT d FROM Doctor d WHERE LOWER(d.firstName) LIKE LOWER(CONCAT('%', :name, '%')) OR LOWER(d.lastName) LIKE LOWER(CONCAT('%', :name, '%')) ORDER BY d.lastName ASC")
+    List<Doctor> searchDoctorsByNameJPQL(@Param("name") String name);
 }

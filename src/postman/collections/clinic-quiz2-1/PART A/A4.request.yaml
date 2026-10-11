@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:8080/api/doctors/3087ae16-4808-4051-b3f2-2ee571113758/office?officeNumber=104
+method: PATCH
+queryParams:
+  officeNumber: "104"
+order: 4438140075183366

@@ -1,18 +1,19 @@
 package com.mady.clinics.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.sql.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 
@@ -69,9 +70,14 @@ public class Patient {
     public void setAppointments(List<Appointment> appointments) {
         this.appointments = appointments;
     }
+    @Column(name = "ss_number", unique = true)
+    private String ssNumber;
+
+    public String getSsNumber() { return ssNumber; }
+    public void setSsNumber(String ssNumber) { this.ssNumber = ssNumber; }
 
     // relationships with other entities can be added here, such as appointments, etc.
     @JsonIgnore
     @OneToMany(mappedBy = "patient")
     private List<Appointment> appointments = new ArrayList<>();
-}
+}

@@ -1,14 +1,19 @@
 package com.mady.clinics.controller;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
+import com.mady.clinics.domain.Appointment;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,39 +61,55 @@ public class DoctorController {
     }
 
     // Assign office (supports both /office/ and /offices/)
-    @PutMapping({"/{doctorId}/office/{officeId}", "/{doctorId}/offices/{officeId}"})
-    public ResponseEntity<Doctor> assignOffice(@PathVariable UUID doctorId, @PathVariable UUID officeId) {
-        Doctor updated = DoctorService.assignOffice(doctorId, officeId);
-        return new ResponseEntity<>(updated, HttpStatus.OK);
+    @PutMapping("/{doctorId}/specializations/{specializationId}")
+public ResponseEntity<String> addSpecialization(@PathVariable UUID doctorId, @PathVariable UUID specializationId) {
+    String res = DoctorService.addSpecialization(doctorId, specializationId);
+    if (res.equals("Specialization added to the doctor")) {
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    } else if (res.contains("does not exist")) {
+        return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
+    } else {
+        return new ResponseEntity<>(res, HttpStatus.CONFLICT);
     }
-
-    // Assign specialization (supports both /specialization/ and /specializations/)
-    @PutMapping({"/{doctorId}/specialization/{specializationId}", "/{doctorId}/specializations/{specializationId}"})
-    public ResponseEntity<Doctor> addSpecialization(@PathVariable UUID doctorId, @PathVariable UUID specializationId) {
-        Doctor updated = DoctorService.addSpecializationToDoctor(doctorId, specializationId);
-        return new ResponseEntity<>(updated, HttpStatus.OK);
+}
+    @PatchMapping("/{doctorId}/office")
+public ResponseEntity<String> moveDoctorOffice(@PathVariable UUID doctorId, @RequestParam int officeNumber) {
+    String res = DoctorService.moveDoctorOffice(doctorId, officeNumber);
+    if (res.equals("Office changed successfully")) {
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    } else if (res.contains("does not exist")) {
+        return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
+    } else {
+        return new ResponseEntity<>(res, HttpStatus.CONFLICT);
     }
+}
 
     // Remove specialization
-    @DeleteMapping({"/{doctorId}/specialization/{specializationId}", "/{doctorId}/specializations/{specializationId}"})
-    public ResponseEntity<Doctor> removeSpecialization(@PathVariable UUID doctorId, @PathVariable UUID specializationId) {
-        Doctor updated = DoctorService.removeSpecializationFromDoctor(doctorId, specializationId);
-        return new ResponseEntity<>(updated, HttpStatus.OK);
+    @DeleteMapping("/{doctorId}/specializations/{specializationId}")
+public ResponseEntity<String> removeSpecialization(@PathVariable UUID doctorId, @PathVariable UUID specializationId) {
+    String res = DoctorService.removeSpecialization(doctorId, specializationId);
+    if (res.equals("Specialization removed from the doctor")) {
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    } else if (res.contains("does not exist")) {
+        return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
+    } else {
+        return new ResponseEntity<>(res, HttpStatus.CONFLICT);
     }
+}
 
-    // Existing search
+    // D3: search doctors by name (JPQL)
     @GetMapping("/search")
     public ResponseEntity<List<Doctor>> searchDoctors(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Date dob) {
         if (name != null && !name.isBlank()) {
-            return new ResponseEntity<>(DoctorService.searchByName(name), HttpStatus.OK);
+            return new ResponseEntity<>(DoctorService.searchDoctorsByNameJPQL(name), HttpStatus.OK);
         } else if (dob != null) {
             return new ResponseEntity<>(DoctorService.searchByDateOfBirth(dob), HttpStatus.OK);
         }
         return new ResponseEntity<>(DoctorService.getAllDoctors(), HttpStatus.OK);
     }
-
+    
     // B1: doctors by specialization
     @GetMapping("/by-specialization")
     public ResponseEntity<List<Doctor>> getBySpecialization(@RequestParam String name) {
@@ -99,5 +120,24 @@ public class DoctorController {
     @GetMapping("/without-office")
     public ResponseEntity<List<Doctor>> getDoctorsWithoutOffice() {
         return new ResponseEntity<>(DoctorService.getDoctorsWithoutOffice(), HttpStatus.OK);
+    }
+
+    // D1: Doctor's agenda for a day (DERIVED)
+    @GetMapping("/{doctorId}/agenda")
+    public ResponseEntity<?> getDoctorAgenda(@PathVariable UUID doctorId, @RequestParam String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        Optional<List<Appointment>> agenda = DoctorService.getDoctorAgenda(doctorId, localDate);
+        if (agenda.isEmpty()) {
+            return new ResponseEntity<>("The doctor with that id does not exist", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(agenda.get(), HttpStatus.OK);
+    }
+
+    // Bonus +5: Doctor workload (JPQL)
+    @GetMapping("/workload")
+    public ResponseEntity<List<Object[]>> getDoctorWorkload(@RequestParam String start, @RequestParam String end) {
+        LocalDate startDate = LocalDate.parse(start);
+        LocalDate endDate = LocalDate.parse(end);
+        return new ResponseEntity<>(DoctorService.getDoctorWorkload(startDate, endDate), HttpStatus.OK);
     }
 }

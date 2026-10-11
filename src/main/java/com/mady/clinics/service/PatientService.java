@@ -1,5 +1,6 @@
 package com.mady.clinics.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -7,7 +8,10 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mady.clinics.domain.Appointment;
+import com.mady.clinics.domain.AppointmentStatus;
 import com.mady.clinics.domain.Patient;
+import com.mady.clinics.repository.AppointmentRepository;
 import com.mady.clinics.repository.DoctorRepository;
 import com.mady.clinics.repository.PatientRepository;
 
@@ -19,6 +23,9 @@ public class PatientService {
 
     @Autowired
     private DoctorRepository doctorRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     public Patient save(Patient patient) {
         return patientRepository.save(patient);
@@ -80,5 +87,14 @@ public class PatientService {
     // B4: patients with no appointments
     public List<Patient> getPatientsWithoutAppointments() {
         return patientRepository.findPatientsWithoutAppointments();
+    }
+
+    // D2: Upcoming appointments of a patient (DERIVED)
+    public Optional<List<Appointment>> getUpcomingAppointments(String ssNumber) {
+        if (!patientRepository.existsBySsNumber(ssNumber)) {
+            return Optional.empty();
+        }
+        return Optional.of(appointmentRepository.findByPatient_SsNumberAndAppointmentDateGreaterThanEqualAndStatusInOrderByAppointmentDateAsc(
+                ssNumber, LocalDate.now(), List.of(AppointmentStatus.SCHEDULED, AppointmentStatus.CONFIRMED)));
     }
 }

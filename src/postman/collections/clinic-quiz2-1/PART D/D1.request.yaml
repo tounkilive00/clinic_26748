@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:8080/api/doctors/3087ae16-4808-4051-b3f2-2ee571113758/agenda?date=2026-10-20
+method: GET
+queryParams:
+  date: 2026-10-20
+order: 1791743380223

@@ -1,0 +1,19 @@
+$kind: http-request
+url: http://localhost:8080/api/appointments/save
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"appointmentDate\": \"2026-11-01\",\r
+
+    \  \"reason\": \"Regular checkup\",\r
+
+    \  \"status\": \"COMPLETED\",\r
+
+    \  \"doctor\": { \"doctorId\": \"3087ae16-4808-4051-b3f2-2ee571113758\" },\r
+
+    \  \"patient\": { \"patientId\": \"fefd6d33-293e-4731-b0ae-f7cf6ca2521d\" }\r
+
+    }"
+order: 71362791564482

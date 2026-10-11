@@ -1,6 +1,7 @@
 package com.mady.clinics.service;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mady.clinics.domain.Appointment;
+import com.mady.clinics.domain.AppointmentStatus;
 import com.mady.clinics.domain.Doctor;
 import com.mady.clinics.domain.Office;
 import com.mady.clinics.domain.Specialization;
+import com.mady.clinics.repository.AppointmentRepository;
 import com.mady.clinics.repository.DoctorRepository;
 import com.mady.clinics.repository.OfficeRepository;
 import com.mady.clinics.repository.SpecializationsRepository;
@@ -28,6 +32,9 @@ public class DoctorService {
 
     @Autowired
     private SpecializationsRepository specializationsRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     public Doctor saveDoctor(Doctor doctor) {
         return doctorRepository.save(doctor);
@@ -143,5 +150,77 @@ public class DoctorService {
     // B2: doctors without an office
     public List<Doctor> getDoctorsWithoutOffice() {
         return doctorRepository.findDoctorsWithoutOffice();
+    }
+    @Transactional
+public String addSpecialization(UUID doctorId, UUID specializationId) {
+    Optional<Doctor> docOpt = doctorRepository.findById(doctorId);
+    if (docOpt.isEmpty()) return "The doctor with that id does not exist";
+
+    Optional<Specialization> specOpt = specializationsRepository.findById(specializationId);
+    if (specOpt.isEmpty()) return "That specialization does not exist";
+
+    Doctor doctor = docOpt.get();
+    Specialization spec = specOpt.get();
+    if (doctor.getSpecializations().contains(spec)) {
+        return "The doctor already has that specialization";
+    }
+    doctor.getSpecializations().add(spec);
+    doctorRepository.save(doctor);
+    return "Specialization added to the doctor";
+}
+
+@Transactional
+public String removeSpecialization(UUID doctorId, UUID specializationId) {
+    Optional<Doctor> docOpt = doctorRepository.findById(doctorId);
+    if (docOpt.isEmpty()) return "The doctor with that id does not exist";
+
+    Optional<Specialization> specOpt = specializationsRepository.findById(specializationId);
+    if (specOpt.isEmpty()) return "That specialization does not exist";
+
+    Doctor doctor = docOpt.get();
+    Specialization spec = specOpt.get();
+    if (!doctor.getSpecializations().contains(spec)) {
+        return "The doctor does not have that specialization";
+    }
+    doctor.getSpecializations().remove(spec);
+    doctorRepository.save(doctor);
+    return "Specialization removed from the doctor";
+}
+
+@Transactional
+public String moveDoctorOffice(UUID doctorId, int officeNumber) {
+    Optional<Doctor> docOpt = doctorRepository.findById(doctorId);
+    if (docOpt.isEmpty()) return "The doctor with that id does not exist";
+
+    Optional<Office> offOpt = officeRepository.findByOfficeNumber(officeNumber);
+    if (offOpt.isEmpty()) return "The office with that office number does not exist";
+
+    if (doctorRepository.existsByOffice_OfficeNumber(officeNumber)) {
+        return "That office is taken by other doctor";
+    }
+
+    Doctor doctor = docOpt.get();
+    doctor.setOffice(offOpt.get());
+    doctorRepository.save(doctor);
+    return "Office changed successfully";
+}
+
+    // D1: Doctor's agenda for a day without CANCELLED
+    public Optional<List<Appointment>> getDoctorAgenda(UUID doctorId, LocalDate date) {
+        if (!doctorRepository.existsById(doctorId)) {
+            return Optional.empty();
+        }
+        return Optional.of(appointmentRepository.findByDoctor_DoctorIdAndAppointmentDateAndStatusNot(
+                doctorId, date, AppointmentStatus.CANCELLED));
+    }
+
+    // D3: Search doctors by name using JPQL
+    public List<Doctor> searchDoctorsByNameJPQL(String name) {
+        return doctorRepository.searchDoctorsByNameJPQL(name);
+    }
+
+    // Bonus +5: Doctor workload
+    public List<Object[]> getDoctorWorkload(LocalDate start, LocalDate end) {
+        return appointmentRepository.findDoctorWorkload(start, end);
     }
 }

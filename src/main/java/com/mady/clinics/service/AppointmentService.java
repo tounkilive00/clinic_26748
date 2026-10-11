@@ -32,6 +32,9 @@ public class AppointmentService {
     @Autowired
     private PatientRepository patientRepository;
 
+    @Autowired
+    private com.mady.clinics.repository.PrescriptionRepository prescriptionRepository;
+
     // Save with double-booking check (A4)
     public Appointment saveAppointment(Appointment appointment) {
         if (appointment.getDoctor() != null && appointment.getDoctor().getDoctorId() != null) {
@@ -74,7 +77,6 @@ public class AppointmentService {
             Appointment appointment = existingAppointment.get();
             appointment.setAppointmentDate(updatedAppointment.getAppointmentDate());
             appointment.setReason(updatedAppointment.getReason());
-            appointment.setStatus(updatedAppointment.getStatus());
             if (updatedAppointment.getDoctor() != null && updatedAppointment.getDoctor().getDoctorId() != null) {
                 UUID doctorId = updatedAppointment.getDoctor().getDoctorId();
                 Doctor doctor = doctorRepository.findById(doctorId)
@@ -93,8 +95,15 @@ public class AppointmentService {
         }
     }
 
-    public void deleteAppointment(UUID appointmentId) {
+    public String deleteAppointment(UUID appointmentId) {
+        if (!appointmentRepository.existsById(appointmentId)) {
+            return "The appointment with that id does not exist";
+        }
+        if (prescriptionRepository.existsByAppointment_AppointmentId(appointmentId)) {
+            return "That appointment has prescriptions, delete them first";
+        }
         appointmentRepository.deleteById(appointmentId);
+        return "Appointment deleted successfully";
     }
 
     // A2: by status ordered by date
@@ -139,4 +148,57 @@ public class AppointmentService {
         int count = appointmentRepository.deleteCancelledBefore(date);
         return count + " appointments deleted";
     }
+    // B2: Status flow
+@Transactional
+public String updateStatus(UUID id, AppointmentStatus newStatus) {
+    Optional<Appointment> opt = appointmentRepository.findById(id);
+    if (opt.isEmpty()) {
+        return "The appointment with that id does not exist";
+    }
+    Appointment apt = opt.get();
+    AppointmentStatus current = apt.getStatus();
+
+    boolean allowed = false;
+    if (current == AppointmentStatus.SCHEDULED && 
+        (newStatus == AppointmentStatus.CONFIRMED || newStatus == AppointmentStatus.CANCELLED)) {
+        allowed = true;
+    } else if (current == AppointmentStatus.CONFIRMED && 
+               (newStatus == AppointmentStatus.COMPLETED || newStatus == AppointmentStatus.CANCELLED)) {
+        allowed = true;
+    }
+
+    if (!allowed) {
+        return "Cannot change status from " + current + " to " + newStatus;
+    }
+
+    apt.setStatus(newStatus);
+    appointmentRepository.save(apt);
+    return "Appointment status updated successfully";
+}
+
+// B3: Reschedule
+@Transactional
+public String rescheduleAppointment(UUID id, LocalDate newDate) {
+    Optional<Appointment> opt = appointmentRepository.findById(id);
+    if (opt.isEmpty()) {
+        return "The appointment with that id does not exist";
+    }
+    Appointment apt = opt.get();
+    if (apt.getStatus() == AppointmentStatus.COMPLETED || apt.getStatus() == AppointmentStatus.CANCELLED) {
+        return "A " + apt.getStatus() + " appointment cannot be rescheduled";
+    }
+    if (newDate.isBefore(LocalDate.now())) {
+        return "Appointment date cannot be in the past";
+    }
+    boolean booked = appointmentRepository.existsByDoctor_DoctorIdAndAppointmentDateAndStatusNot(
+            apt.getDoctor().getDoctorId(), newDate, AppointmentStatus.CANCELLED);
+    if (booked) {
+        return "Doctor is already booked on that date";
+    }
+
+    apt.setAppointmentDate(newDate);
+    apt.setStatus(AppointmentStatus.SCHEDULED);
+    appointmentRepository.save(apt);
+    return "Appointment rescheduled successfully";
+}
 }

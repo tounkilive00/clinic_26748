@@ -91,4 +91,14 @@ public class PatientController {
     public ResponseEntity<List<Patient>> getPatientsWithoutAppointments() {
         return new ResponseEntity<>(patientService.getPatientsWithoutAppointments(), HttpStatus.OK);
     }
+
+    // D2: Upcoming appointments of a patient (DERIVED)
+    @GetMapping("/{ssNumber}/upcoming")
+    public ResponseEntity<?> getUpcomingAppointments(@PathVariable String ssNumber) {
+        Optional<List<com.mady.clinics.domain.Appointment>> list = patientService.getUpcomingAppointments(ssNumber);
+        if (list.isEmpty()) {
+            return new ResponseEntity<>("That patient with that ssnumber does not exist", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(list.get(), HttpStatus.OK);
+    }
 }

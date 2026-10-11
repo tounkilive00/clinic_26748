@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:8080/api/appointments/3c36ee63-d5d5-4e1b-b4ab-21dd6cedb4bc/status?status=CONFIRMED
+method: PATCH
+queryParams:
+  status: CONFIRMED
+order: 1791743084970

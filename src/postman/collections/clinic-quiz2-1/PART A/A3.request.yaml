@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/offices/free
+method: GET
+order: 4136893175213035

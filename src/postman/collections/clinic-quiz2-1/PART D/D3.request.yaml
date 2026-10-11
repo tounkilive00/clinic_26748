@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:8080/api/doctors/search?name=gis
+method: GET
+queryParams:
+  name: gis
+order: 4332442900087436

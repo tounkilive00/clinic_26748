@@ -70,4 +70,7 @@ public class OfficeService {
         }
         return Optional.of(results.get(0));
     }
+    public List<Office> getFreeOffices() {
+    return officeRepository.findFreeOffices();
+}
 }

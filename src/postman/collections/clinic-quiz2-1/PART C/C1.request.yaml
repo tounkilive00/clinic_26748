@@ -1,0 +1,17 @@
+$kind: http-request
+url: http://localhost:8080/api/prescriptions/save?appointmentId=dec15797-d552-4e01-9f64-8fe548e7335e
+method: POST
+queryParams:
+  appointmentId: dec15797-d552-4e01-9f64-8fe548e7335e
+body:
+  type: json
+  content: "{\r
+
+    \  \"medicineName\": \"Amoxicillin\",\r
+
+    \  \"dosage\": \"1 tablet, 3 times a day\",\r
+
+    \  \"durationDays\": 7\r
+
+    }"
+order: 1791743234583

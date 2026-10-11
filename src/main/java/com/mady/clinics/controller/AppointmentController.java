@@ -33,9 +33,13 @@ public class AppointmentController {
     @Autowired
     private AppointmentService appointmentService;
 
-    // CREATE with A4 double-booking check
+    // B1: Safe booking
     @PostMapping({"", "/save"})
     public ResponseEntity<?> saveAppointment(@RequestBody Appointment appointment) {
+        if (appointment.getAppointmentDate() != null && appointment.getAppointmentDate().isBefore(LocalDate.now())) {
+            return new ResponseEntity<>("Appointment date cannot be in the past", HttpStatus.BAD_REQUEST);
+        }
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
         if (appointment.getDoctor() != null && appointment.getDoctor().getDoctorId() != null
                 && appointment.getAppointmentDate() != null) {
             if (appointmentService.isDoctorBooked(appointment.getDoctor().getDoctorId(), appointment.getAppointmentDate())) {
@@ -44,6 +48,35 @@ public class AppointmentController {
         }
         Appointment saved = appointmentService.saveAppointment(appointment);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    }
+
+    // B2: Status flow
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<String> updateStatus(@PathVariable UUID id, @RequestParam AppointmentStatus status) {
+        String res = appointmentService.updateStatus(id, status);
+        if (res.equals("Appointment status updated successfully")) {
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } else if (res.equals("The appointment with that id does not exist")) {
+            return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // B3: Reschedule an appointment
+    @PatchMapping("/{id}/reschedule")
+    public ResponseEntity<String> rescheduleAppointment(@PathVariable UUID id, @RequestParam String newDate) {
+        LocalDate parsedDate = LocalDate.parse(newDate);
+        String res = appointmentService.rescheduleAppointment(id, parsedDate);
+        if (res.equals("Appointment rescheduled successfully")) {
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } else if (res.equals("The appointment with that id does not exist")) {
+            return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
+        } else if (res.equals("Doctor is already booked on that date")) {
+            return new ResponseEntity<>(res, HttpStatus.CONFLICT);
+        } else {
+            return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
+        }
     }
 
     // READ ALL
@@ -65,11 +98,17 @@ public class AppointmentController {
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
-    // DELETE
+    // DELETE (C4 protected)
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAppointment(@PathVariable UUID id) {
-        appointmentService.deleteAppointment(id);
-        return new ResponseEntity<>("Appointment deleted successfully", HttpStatus.OK);
+        String res = appointmentService.deleteAppointment(id);
+        if (res.equals("Appointment deleted successfully")) {
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } else if (res.equals("The appointment with that id does not exist")) {
+            return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(res, HttpStatus.CONFLICT);
+        }
     }
 
     // A2: by status

@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/prescriptions/stats/top-medicines
+method: GET
+order: 3148035199056299

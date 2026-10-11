@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:8080/api/appointments/dec15797-d552-4e01-9f64-8fe548e7335e
+method: DELETE
+order: 3955975717408279
