@@ -1,6 +1,0 @@
-$kind: collection
-description: Postman collection to generate the exact missing Doctors and Appointments as per the quiz requirement.
-variables:
-  JEAN_MUGISHA_ID: REPLACE_ME_AFTER_CREATING_DOCTOR_1
-  ALICE_KAYITESI_ID: REPLACE_ME_AFTER_CREATING_DOCTOR_2
-  ERIC_HABIMANA_ID: REPLACE_ME_AFTER_CREATING_DOCTOR_3

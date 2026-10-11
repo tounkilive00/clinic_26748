@@ -1,4 +1,0 @@
-$kind: http-request
-url: http://localhost:8080/api/doctors/{{JEAN_MUGISHA_ID}}/specialization/d63b6de5-4760-47fe-91f4-84970819f421
-method: PUT
-order: 2000

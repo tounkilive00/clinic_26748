@@ -1,4 +1,0 @@
-$kind: http-request
-url: http://localhost:8080/api/doctors/{{ALICE_KAYITESI_ID}}/specialization/dcba5b28-927c-4690-b214-6eb8966b1a4b
-method: PUT
-order: 5000
